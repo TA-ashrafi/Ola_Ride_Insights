@@ -28,3 +28,4 @@ Incomplete_Rides 		INT,
 Incomplete_Rides_Reason VARCHAR(100)
 );
 
+
