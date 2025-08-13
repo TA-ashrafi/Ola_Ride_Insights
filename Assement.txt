@@ -1,0 +1,231 @@
+OLA Dataset – Practice Questions
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Data Cleaning Tasks
+
+* Identify and remove duplicate rows.
+* Handle missing values in driver_rating and fare_amount —
+
+- Option 1: Fill missing ratings with the driver’s average rating.
+- Option 2: Fill missing fare with median fare for that city.
+
+* Standardize the payment_method values (e.g., "card", "Card ", "CARD" → "Card").
+* Convert trip_start_time and trip_end_time to proper datetime format.
+* Remove trips where trip_duration is less than 1 minute or fare_amount is negative.
+* Extract date, day_of_week, and hour from trip_start_time.
+* Normalize pickup_location and drop_location names (remove typos).
+
+
+
+SQL Practice Questions
+
+Easy
+
+* Find total trips completed in each city.
+* Get the average fare amount for each payment method.
+* Find the total number of rides per day of the week.
+* List top 5 drivers by total number of trips.
+* Find the total revenue generated on weekends.
+* Show the total trips taken by each ride_type (Mini, Prime, Auto, etc.).
+
+Medium
+
+* Find the driver with the highest average rating in each city.
+* List customers who took more than 5 rides in July 2025.
+* Find the average trip duration per city.
+* Medium: List the top 5 drop-off locations by total revenue.
+* Show the top 3 most popular pickup locations in Mumbai.
+* Find the % of cash vs online payment rides in Bengaluru.
+
+Hard
+
+* Calculate the daily revenue growth rate for each city.
+* For each city, find the driver who earned the most in a single day.
+* Find customers who spent more than ₹5,000 in total for the month.
+* Calculate the average fare per km for each ride type.
+* Find the hour of the day with the highest number of bookings per city.
+* Hard: Find the busiest day in July 2025 by number of rides.
+
+
+--------------------------------------------------------
+
+
+Analysis & Visualization (Tableau / Power BI)
+
+* City-wise revenue comparison.
+* Ride type distribution (pie chart).
+* Daily trips trend line for the month.
+* Driver performance heatmap (rating vs trips).
+* Payment method preference by city.
+* Peak booking hours chart.
+* Top 10 customers by total spend.
+* Average fare vs distance scatter plot.
+
+
+
+ANSWER
+
+
+
+
+
+
+
+
+-- Easy Queries
+-- 1. Find total trips completed in each city.
+SELECT 'Bengaluru' AS City, COUNT(*) AS Total_Trips
+FROM dataset
+WHERE Booking_Status = 'Success';
+
+-- 2. Get the average fare amount for each payment method.
+-- Assumption: No payment_method, using Vehicle_Type as proxy
+SELECT Vehicle_Type, AVG(Booking_Value) AS Avg_Fare
+FROM dataset
+WHERE Booking_Status = 'Success'
+GROUP BY Vehicle_Type;
+
+-- 3. List top 5 drivers by total number of trips.
+-- Assumption: No driver_id, using Driver_Ratings as proxy
+SELECT Driver_Ratings, COUNT(*) AS Total_Trips
+FROM dataset
+WHERE Booking_Status = 'Success'
+GROUP BY Driver_Ratings
+ORDER BY Total_Trips DESC
+LIMIT 5;
+
+-- 4. Find the total revenue generated on weekends.
+SELECT SUM(Booking_Value) AS Weekend_Revenue
+FROM dataset
+WHERE Booking_Status = 'Success'
+  AND Days_Of_Week IN ('Saturday', 'Sunday');
+
+-- 5. Show the total trips taken by each ride_type.
+SELECT Vehicle_Type, COUNT(*) AS Total_Trips
+FROM dataset
+WHERE Booking_Status = 'Success'
+GROUP BY Vehicle_Type;
+
+-- Medium Queries
+-- 6. Find the driver with the highest average rating in each city.
+-- Assumption: No city or driver_id, using Bengaluru and Driver_Ratings
+SELECT 'Bengaluru' AS City, Driver_Ratings, AVG(Driver_Ratings) AS Avg_Rating
+FROM dataset
+WHERE Booking_Status = 'Success'
+GROUP BY Driver_Ratings
+ORDER BY Avg_Rating DESC
+LIMIT 1;
+
+-- 7. List customers who took more than 5 rides in July 2025.
+SELECT Customer_Id, COUNT(*) AS Ride_Count
+FROM dataset
+WHERE Booking_Status = 'Success'
+  AND DATE_FORMAT(Trip_Start_Time, '%Y-%m') = '2025-07'
+GROUP BY Customer_Id
+HAVING Ride_Count > 5;
+
+-- 8. Find the average trip duration per city.
+-- Assumption: Trip_End_Time same as Trip_Start_Time, placeholder
+SELECT 'Bengaluru' AS City, AVG(TIMESTAMPDIFF(MINUTE, Trip_Start_Time, Trip_End_Time)) AS Avg_Duration_Minutes
+FROM dataset
+WHERE Booking_Status = 'Success';
+
+-- 9. Show the top 3 most popular pickup locations in Mumbai.
+-- Assumption: No city, using Bengaluru
+SELECT Pickup_Location, COUNT(*) AS Trip_Count
+FROM dataset
+WHERE Booking_Status = 'Success'
+GROUP BY Pickup_Location
+ORDER BY Trip_Count DESC
+LIMIT 3;
+
+-- 10. Find the % of cash vs online payment rides in Bengaluru.
+-- Assumption: No payment_method, using Vehicle_Type as proxy
+SELECT 'Bengaluru' AS City, Vehicle_Type AS Payment_Method, 
+       (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS Percentage
+FROM dataset
+WHERE Booking_Status = 'Success'
+GROUP BY Vehicle_Type;
+
+-- Hard Queries
+-- 11. Calculate the daily revenue growth rate for each city.
+WITH DailyRevenue AS (
+    SELECT DATE(Trip_Start_Time) AS Trip_Date, SUM(Booking_Value) AS Daily_Revenue
+    FROM dataset
+    WHERE Booking_Status = 'Success'
+    GROUP BY DATE(Trip_Start_Time)
+)
+SELECT Trip_Date, 'Bengaluru' AS City,
+       ((Daily_Revenue - LAG(Daily_Revenue) OVER (ORDER BY Trip_Date)) / 
+        LAG(Daily_Revenue) OVER (ORDER BY Trip_Date) * 100) AS Revenue_Growth_Rate
+FROM DailyRevenue
+ORDER BY Trip_Date;
+
+-- 12. For each city, find the driver who earned the most in a single day.
+-- Assumption: No driver_id, using Driver_Ratings
+WITH DailyDriverRevenue AS (
+    SELECT DATE(Trip_Start_Time) AS Trip_Date, Driver_Ratings, 
+           SUM(Booking_Value) AS Daily_Revenue
+    FROM dataset
+    WHERE Booking_Status = 'Success'
+    GROUP BY DATE(Trip_Start_Time), Driver_Ratings
+),
+RankedDrivers AS (
+    SELECT Trip_Date, Driver_Ratings, Daily_Revenue,
+           ROW_NUMBER() OVER (PARTITION BY Trip_Date ORDER BY Daily_Revenue DESC) AS rn
+    FROM DailyDriverRevenue
+)
+SELECT Trip_Date, 'Bengaluru' AS City, Driver_Ratings, Daily_Revenue
+FROM RankedDrivers
+WHERE rn = 1
+ORDER BY Trip_Date;
+
+-- 13. Find customers who spent more than ₹5,000 in total for the month.
+SELECT Customer_Id, SUM(Booking_Value) AS Total_Spent
+FROM dataset
+WHERE Booking_Status = 'Success'
+  AND DATE_FORMAT(Trip_Start_Time, '%Y-%m') = '2025-07'
+GROUP BY Customer_Id
+HAVING Total_Spent > 5000;
+
+-- 14. Calculate the average fare per km for each ride type.
+SELECT Vehicle_Type, AVG(Booking_Value / Ride_Distance) AS Avg_Fare_Per_Km
+FROM dataset
+WHERE Booking_Status = 'Success' AND Ride_Distance > 0
+GROUP BY Vehicle_Type;
+
+-- 15. Find the hour of the day with the highest number of bookings per city.
+SELECT 'Bengaluru' AS City, Hour, COUNT(*) AS Booking_Count
+FROM dataset
+WHERE Booking_Status = 'Success'
+GROUP BY Hour
+ORDER BY Booking_Count DESC
+LIMIT 1;
+
+-- Additional Queries
+-- 16. Find the total number of rides per day of the week.
+SELECT Days_Of_Week, COUNT(*) AS Total_Rides
+FROM dataset
+WHERE Booking_Status = 'Success'
+GROUP BY Days_Of_Week
+ORDER BY Total_Rides DESC;
+
+-- 17. List the top 5 drop-off locations by total revenue.
+SELECT Drop_Location, SUM(Booking_Value) AS Total_Revenue
+FROM dataset
+WHERE Booking_Status = 'Success'
+GROUP BY Drop_Location
+ORDER BY Total_Revenue DESC
+LIMIT 5;
+
+-- 18. Find the busiest day in July 2025 by number of rides.
+SELECT DATE(Trip_Start_Time) AS Trip_Date, COUNT(*) AS Ride_Count
+FROM dataset
+WHERE Booking_Status = 'Success'
+  AND DATE_FORMAT(Trip_Start_Time, '%Y-%m') = '2025-07'
+GROUP BY DATE(Trip_Start_Time)
+ORDER BY Ride_Count DESC
+LIMIT 1;
