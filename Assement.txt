@@ -69,14 +69,7 @@ Analysis & Visualization (Tableau / Power BI)
 ANSWER
 
 -- Medium Queries
--- 6. Find the driver with the highest average rating in each city.
--- Assumption: No city or driver_id, using Bengaluru and Driver_Ratings
-SELECT 'Bengaluru' AS City, Driver_Ratings, AVG(Driver_Ratings) AS Avg_Rating
-FROM dataset
-WHERE Booking_Status = 'Success'
-GROUP BY Driver_Ratings
-ORDER BY Avg_Rating DESC
-LIMIT 1;
+
 
 -- 7. List customers who took more than 5 rides in July 2025.
 SELECT Customer_Id, COUNT(*) AS Ride_Count

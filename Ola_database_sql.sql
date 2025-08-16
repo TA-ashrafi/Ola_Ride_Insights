@@ -70,6 +70,24 @@ WHERE Booking_Status = 'Success'
 GROUP BY vehicle_Type;
 
 
+-- MEDIUM LEVEL QUERIES
+
+-- 6. Find the driver with the highest average rating in each city.
+CREATE VIEW Higest_Avg_Rating_city AS 
+SELECT 'City' AS City , Driver_Ratings , AVG(Driver_Ratings) AS AVG_Rating
+FROM Ola_Database 
+WHERE Booking_Status = 'Success'
+GROUP BY Driver_Ratings
+ORDER BY Driver_Ratings DESC
+LIMIT 1;
+
+-- 7. List customers who took more than 5 rides in July 2025.
+CREATE VIEW More_Than_5_Ride_07_2025 AS
+SELECT Customer_Id , COUNT(*) AS Ride_count 
+FROM Ola_Database
+WHERE Booking_Status = 'Success' AND Date_Format(Trip_Start_Time , '%Y-%m') = '2025-07'
+GROUP BY Customer_Id
+HAVING Ride_Count > 5;
 
 
 
