@@ -37,8 +37,15 @@ WHERE Booking_Status = 'Success';
 -- 2. Get the average fare amount for each payment method.
 SELECT Vehicle_Type , AVG(Booking_Value) as AVE_FARE
 FROM ola_database
-WHERE Booking_Status = 'Sucess'
-GROUP BY vehical_type;
+WHERE Booking_Status = 'Success'
+GROUP BY Vehicle_Type;
 
+-- 3. List top  drivers by total number of trips.
+SELECT Driver_ratings , COUNT(*) AS Total_Trip
+FROM ola_database
+WHERE Booking_Status = 'Success'
+GROUP BY Driver_Ratings
+ORDER BY Total_Trip DESC 
+LIMIT 5;
 	
 
