@@ -90,6 +90,15 @@ GROUP BY Customer_Id
 HAVING Ride_Count > 5;
 
 
+-- 8. Find the average trip duration per city.
+CREATE VIEW Trip_Duration AS  
+SELECT 'City' As City ,  AVG(TIMESTAMPDIFF(MINUTE, Trip_Start_Time, Trip_End_Time)) AS Duration
+FROM Ola_database
+WHERE Booking_Status = 'Success';
+
+-- 9. Show the top 3 most popular pickup locations.
+
+
 
 
 
