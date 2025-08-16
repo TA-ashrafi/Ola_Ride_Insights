@@ -128,12 +128,13 @@ SELECT Trip_Date , ((Daily_Revenue - LAG(Daily_Revenue) OVER(ORDER BY Trip_Date)
 FROM DailyRevenue
 ORDER BY Trip_Date;
 
-
-
-
-
-
-
+-- 12. Find customers who spent more than ₹5,000 in total for the month.
+SELECT Customer_Id, SUM(Booking_Value) AS Total_Spent
+FROM Ola_database
+WHERE Booking_Status = 'Success'
+  AND DATE_FORMAT(Trip_Start_Time, '%Y-%m') = '2025-07'
+GROUP BY Customer_Id
+HAVING Total_Spent > 5000;
 
 
 
