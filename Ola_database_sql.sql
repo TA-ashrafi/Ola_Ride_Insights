@@ -97,7 +97,21 @@ FROM Ola_database
 WHERE Booking_Status = 'Success';
 
 -- 9. Show the top 3 most popular pickup locations.
+SELECT Pickup_Location, COUNT(*) AS Trip_Count
+FROM Ola_Database
+WHERE Booking_Status = 'Success'
+GROUP BY Pickup_Location
+ORDER BY Trip_Count DESC
+LIMIT 3;
 
+-- 10. Find the % of cash vs online payment rides in city.
+SELECT 
+COALESCE(Pickup_Location, 'Unknown') AS City,
+Vehicle_Type,
+(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY Pickup_Location)) AS Percentage
+FROM Ola_database
+WHERE Booking_Status = 'Success'
+GROUP BY Pickup_Location, Vehicle_Type; 
 
 
 
