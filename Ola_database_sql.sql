@@ -29,5 +29,17 @@ Incomplete_Rides_Reason VARCHAR(100)
 );
 
 SELECT * FROM ola_database;
+-- 1. Find total trips completed b.
+SELECT 'Total City ' as city  , count(*) AS Total_Trips
+FROM ola_database 
+WHERE Booking_Status = 'Success';
 
+-- 2. Get the average fare amount for each payment method.
+SELECT Vehicle_Type , AVG(Booking_Value) as AVE_FARE
+FROM ola_database
+WHERE Booking_Status = 'Sucess'
+GROUP BY vehical_type;
+
+-- 3. List top 5 drivers by total number of trips.
+	
 
