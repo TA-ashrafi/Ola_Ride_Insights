@@ -62,6 +62,14 @@ WHERE Booking_Status = 'Success'
 AND Days_Of_Week IN ('Saturday' , 'Sunday');
 
 
+-- 5. Show the total trips taken by each ride_type.
+CREATE VIEW Total_Each_Ride AS 
+SELECT Vehicle_Type , Count(*) AS Total_trip 
+FROM ola_database
+WHERE Booking_Status = 'Success'
+GROUP BY vehicle_Type;
+
+
 
 
 
