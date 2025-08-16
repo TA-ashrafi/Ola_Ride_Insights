@@ -105,13 +105,49 @@ ORDER BY Trip_Count DESC
 LIMIT 3;
 
 -- 10. Find the % of cash vs online payment rides in city.
+CREATE VIEW Per_Ride_Cite AS
 SELECT 
 COALESCE(Pickup_Location, 'Unknown') AS City,
 Vehicle_Type,
 (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY Pickup_Location)) AS Percentage
 FROM Ola_database
 WHERE Booking_Status = 'Success'
-GROUP BY Pickup_Location, Vehicle_Type; 
+GROUP BY Pickup_Location, Vehicle_Type
+ORDER BY Percentage DESC;
+
+
+-- 11. Calculate the daily revenue growth rate for each city.
+WITH DailyRevenue AS(
+SELECT 
+DATE(Trip_Start_Time) AS Trip_Date, 
+SUM(Booking_Value) AS Daily_Revenue
+FROM Ola_Database
+WHERE Booking_Status = 'Success'
+GROUP BY DATE(trip_Start_Time))
+SELECT Trip_Date , ((Daily_Revenue - LAG(Daily_Revenue) OVER(ORDER BY Trip_Date)) / LAG(Daily_Revenue) OVER(ORDER BY Trip_Date) * 100) AS Growth_Rate 
+FROM DailyRevenue
+ORDER BY Trip_Date;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

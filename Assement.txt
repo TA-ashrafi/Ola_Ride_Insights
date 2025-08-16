@@ -69,8 +69,10 @@ Analysis & Visualization (Tableau / Power BI)
 ANSWER
 
 -- Hard Queries
+
 -- 11. Calculate the daily revenue growth rate for each city.
-WITH DailyRevenue AS (
+
+WITH DailyRevenue AS ( 
     SELECT DATE(Trip_Start_Time) AS Trip_Date, SUM(Booking_Value) AS Daily_Revenue
     FROM dataset
     WHERE Booking_Status = 'Success'
@@ -81,6 +83,9 @@ SELECT Trip_Date, 'Bengaluru' AS City,
         LAG(Daily_Revenue) OVER (ORDER BY Trip_Date) * 100) AS Revenue_Growth_Rate
 FROM DailyRevenue
 ORDER BY Trip_Date;
+
+
+
 
 -- 12. For each city, find the driver who earned the most in a single day.
 -- Assumption: No driver_id, using Driver_Ratings
