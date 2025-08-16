@@ -47,7 +47,7 @@ Hard
 * Find customers who spent more than ₹5,000 in total for the month.
 * Calculate the average fare per km for each ride type.
 * Find the hour of the day with the highest number of bookings per city.
-* Hard: Find the busiest day in July 2025 by number of rides.
+* Find the busiest day in July 2025 by number of rides.
 
 
 --------------------------------------------------------
@@ -67,40 +67,6 @@ Analysis & Visualization (Tableau / Power BI)
 
 
 ANSWER
-
--- Medium Queries
-
-
--- 7. List customers who took more than 5 rides in July 2025.
-SELECT Customer_Id, COUNT(*) AS Ride_Count
-FROM dataset
-WHERE Booking_Status = 'Success'
-  AND DATE_FORMAT(Trip_Start_Time, '%Y-%m') = '2025-07'
-GROUP BY Customer_Id
-HAVING Ride_Count > 5;
-
--- 8. Find the average trip duration per city.
--- Assumption: Trip_End_Time same as Trip_Start_Time, placeholder
-SELECT 'Bengaluru' AS City, AVG(TIMESTAMPDIFF(MINUTE, Trip_Start_Time, Trip_End_Time)) AS Avg_Duration_Minutes
-FROM dataset
-WHERE Booking_Status = 'Success';
-
--- 9. Show the top 3 most popular pickup locations in Mumbai.
--- Assumption: No city, using Bengaluru
-SELECT Pickup_Location, COUNT(*) AS Trip_Count
-FROM dataset
-WHERE Booking_Status = 'Success'
-GROUP BY Pickup_Location
-ORDER BY Trip_Count DESC
-LIMIT 3;
-
--- 10. Find the % of cash vs online payment rides in Bengaluru.
--- Assumption: No payment_method, using Vehicle_Type as proxy
-SELECT 'Bengaluru' AS City, Vehicle_Type AS Payment_Method, 
-       (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS Percentage
-FROM dataset
-WHERE Booking_Status = 'Success'
-GROUP BY Vehicle_Type;
 
 -- Hard Queries
 -- 11. Calculate the daily revenue growth rate for each city.
