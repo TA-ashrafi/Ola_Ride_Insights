@@ -31,27 +31,45 @@ Incomplete_Rides_Reason VARCHAR(100)
 SELECT * FROM ola_database;
 
 -- 1. Find total trips completed .
-CREATE VIEW Total_trips AS
+CREATE VIEW Total_Trips AS
 SELECT 'Total City ' as city  , count(*) AS Total_Trips
 FROM ola_database 
 WHERE Booking_Status = 'Success';
 
-SELECT * FROM Total_trips; 
-
 
 -- 2. Get the average fare amount for each payment method.
+CREATE VIEW Avg_Fareamount AS 
 SELECT Vehicle_Type , AVG(Booking_Value) as AVE_FARE
 FROM ola_database
 WHERE Booking_Status = 'Success'
 GROUP BY Vehicle_Type;
 
 -- 3. List top  drivers by total number of trips.
+CREATE VIEW Top_Driver AS
 SELECT Driver_ratings , COUNT(*) AS Total_Trip
 FROM ola_database
 WHERE Booking_Status = 'Success'
 GROUP BY Driver_Ratings
 ORDER BY Total_Trip DESC 
 LIMIT 5;
+
+
+-- 4. Find the total revenue generated on weekends.
+CREATE VIEW Total_revenue_Weekends AS 
+SELECT SUM(Booking_Value) AS Weekend_Revenue 
+FROM Ola_database 
+WHERE Booking_Status = 'Success' 
+AND Days_Of_Week IN ('Saturday' , 'Sunday');
+
+
+
+
+
+
+
+
+
+
 
 	
 
